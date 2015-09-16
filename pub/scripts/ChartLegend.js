@@ -50,6 +50,20 @@ ChartLegend.prototype.bindLegendInteractions = function () {
       this.controller.updatePageState()
     }.bind(this))
 
+    // open color input
+    series.legendEl.find('.legend-color').click(function (event) {
+      event.stopPropagation()
+
+      var colorHex = this.chart.colorFn(series.label).replace(/^#/, '')
+
+
+      series.legendEl.addClass('active')
+      series.legendEl.append(this.changeSeriesColorHTML({colorHex: colorHex}))
+      this.$container.find('.change-series-color').click(function (e) {
+        e.stopPropagation()
+      }.bind(this))
+    }.bind(this))
+
     // open move-chart popover
     series.legendEl.find('.move-chart').click(function (event) {
       event.stopPropagation()
@@ -90,6 +104,7 @@ ChartLegend.prototype.bindLegendInteractions = function () {
   // remove popovers
   $('body').click(function () {
     this.$container.find('.move-chart-options').remove()
+    this.$container.find('.change-series-color').remove()
     this.$container.find('.legend-item').removeClass('active')
   }.bind(this))
 }
@@ -99,8 +114,8 @@ ChartLegend.prototype.legendItemHTML = function(label) {
   template +='<li class="legend-item">'
   template +='  <div class="legend-label info-input">'
   template +='    <span class="legend-input" <% if (editable) {%> contenteditable="true" <%}%> ><%- label %></span>'
-  template +='    <span style="background-color:<%- color %>;" class="legend-box"></span>'
   template +='  </div>'
+  template +='  <button class="legend-color"><span style="background-color:<%- color %>;" class="legend-dot"></span></button>'
   template +='  <% if (editable) { %>'
   template +='    <button class="move-chart"><span class="icon icon-move"></span></button>'
   template +='  <% } %>'
@@ -123,4 +138,13 @@ ChartLegend.prototype.moveChartHTML = function (otherCharts) {
   template +='  <span class="arrow-bottom-right"></span>'
   template +='</div>'
   return _.template(template, otherCharts)
+}
+
+ChartLegend.prototype.changeSeriesColorHTML = function (params) {
+  var template = ''
+  template +='<div class="change-series-color popover">'
+  template +='  <p>Change color:</p>'
+  template +='  <p><span contenteditable="true" class="color-hex-input"><%- colorHex %></span></p>'
+  template +='</div>'
+  return _.template(template, params)
 }
